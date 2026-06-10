@@ -10,3 +10,4 @@ sqlmodel
 uvicorn
 python-dotenv
 asyncpg
+langgraph

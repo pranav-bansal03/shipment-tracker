@@ -134,3 +134,72 @@ async def analyze_shipment(
             status_code=502,
             detail=f"LLM returned invalid structured JSON: {content}"
         ) from exc
+
+
+
+async def classify_query(
+    query: str,
+    team_id: str,
+    end_user_id: str
+) -> str:
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are an audit query classifier. "
+                "Classify the user query as either 'complaint' or 'question'. "
+                "Respond with ONLY the word 'complaint' or 'question'. "
+                "Do not include formatting, punctuation, or other words."
+            )
+        },
+        {
+            "role": "user",
+            "content": query
+        }
+    ]
+    result = await chat(messages, team_id, end_user_id)
+    return result.strip().lower()
+
+
+async def generate_complaint_response(
+    query: str,
+    team_id: str,
+    end_user_id: str
+) -> str:
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are a professional audit customer support representative. "
+                "A user has submitted a complaint about an audit or shipment issue. "
+                "Acknowledge the issue professionally, offer a polite apology, and outline a clear resolution step."
+            )
+        },
+        {
+            "role": "user",
+            "content": query
+        }
+    ]
+    return await chat(messages, team_id, end_user_id)
+
+
+async def generate_question_response(
+    query: str,
+    team_id: str,
+    end_user_id: str
+) -> str:
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are a logistics and audit expert assistant. "
+                "A user has asked a question about shipment tracking, audits, or logistics. "
+                "Provide a clear, helpful, and concise answer."
+            )
+        },
+        {
+            "role": "user",
+            "content": query
+        }
+    ]
+    return await chat(messages, team_id, end_user_id)

@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.schemas.feedback import FeedbackRequest, FeedbackResponse
+from app.services.feedback import run_feedback_flow
 
 from app.schemas.summary import (
     ShipmentRisk,
@@ -61,4 +63,29 @@ async def summarize_shipment(
         shipment.status.value,
         request.team_id,
         request.end_user_id
+    )
+
+
+@router.post(
+    "/feedback/analyze",
+    response_model=FeedbackResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Analyze query using a LangGraph workflow",
+    description=(
+        "Sends a query through a LangGraph workflow that classifies it "
+        "as a complaint or a question and handles it accordingly."
+    )
+)
+async def analyze_feedback(request: FeedbackRequest):
+    # Run the compiled LangGraph flow
+    final_state = await run_feedback_flow(
+        request.query,
+        request.team_id,
+        request.end_user_id
+    )
+
+    # Return the classification and final response from state
+    return FeedbackResponse(
+        classification=final_state["classification"],
+        response=final_state["response"]
     )
