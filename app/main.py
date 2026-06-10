@@ -5,6 +5,7 @@ from app.db.session import engine
 from app.middleware.logging import LoggingMiddleware
 from app.routers.shipments import router as shipments_router
 from app.routers.summary import router as summary_router
+from app.routers.agent import router as agent_router
 
 app = FastAPI(
     title="Shipment Tracker API",
@@ -29,6 +30,7 @@ app.add_middleware(LoggingMiddleware)
 
 app.include_router(shipments_router)
 app.include_router(summary_router)
+app.include_router(agent_router)
 
 
 @app.on_event("startup")
