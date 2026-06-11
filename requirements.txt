@@ -13,3 +13,4 @@ asyncpg
 langgraph
 langchain-openai
 langchain-community
+fastmcp
